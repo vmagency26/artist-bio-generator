@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Bio Generator | Create Your Music Bio in Seconds</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-card: #111111;
+    --bg-input: #1a1a1a;
+    --bg-hover: #222222;
+    --border: #2a2a2a;
+    --border-focus: #4a4a4a;
+    --text-primary: #f0f0f0;
+    --text-secondary: #999999;
+    --text-muted: #666666;
+    --accent: #c8ff00;
+    --accent-dim: #a3cc00;
+    --accent-glow: rgba(200, 255, 0, 0.08);
+    --danger: #ff4444;
+    --success: #00cc88;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --transition: 0.2s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bio-generator-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  .bio-gen-header { text-align: center; margin-bottom: 48px; }
+
+  .bio-gen-badge {
+    display: inline-block; font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent);
+    background: var(--accent-glow); border: 1px solid rgba(200, 255, 0, 0.15);
+    padding: 6px 16px; border-radius: 100px; margin-bottom: 20px;
+  }
+
+  .bio-gen-header h2 {
+    font-size: clamp(28px, 5vw, 40px); font-weight: 700;
+    letter-spacing: -0.5px; margin-bottom: 14px; line-height: 1.15;
+  }
+
+  .bio-gen-header p {
+    color: var(--text-secondary); font-size: 16px;
+    max-width: 620px; margin: 0 auto; line-height: 1.65;
+  }
+
+  .bio-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px; }
+
+  .bio-step {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 16px; text-align: center;
+  }
+
+  .bio-step-num {
+    font-family: 'Space Mono', monospace; font-size: 12px;
+    color: var(--accent); font-weight: 700; margin-bottom: 6px;
+  }
+
+  .bio-step-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
+  .bio-form {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 40px; margin-bottom: 32px;
+  }
+
+  .bio-form-section { margin-bottom: 28px; }
+  .bio-form-section:last-child { margin-bottom: 0; }
+
+  .bio-form-section-title {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+
+  .bio-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .bio-form-row.full { grid-template-columns: 1fr; }
+  .bio-form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+  @media (max-width: 700px) {
+    .bio-form-row, .bio-form-row.triple { grid-template-columns: 1fr; }
+    .bio-form { padding: 24px 18px; }
+  }
+
+  .bio-field { display: flex; flex-direction: column; gap: 6px; }
+  .bio-field label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .bio-field label .optional { color: var(--text-muted); font-weight: 400; font-style: italic; }
+
+  .bio-field input,
+  .bio-field select,
+  .bio-field textarea {
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--text-primary); background: var(--bg-input);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; outline: none; transition: var(--transition); width: 100%;
+  }
+
+  .bio-field input:focus, .bio-field select:focus, .bio-field textarea:focus {
+    border-color: var(--border-focus); background: var(--bg-hover);
+  }
+
+  .bio-field input::placeholder, .bio-field textarea::placeholder { color: var(--text-muted); }
+
+  .bio-field select {
+    cursor: pointer; color: var(--text-primary); background-color: var(--bg-input);
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+  }
+
+  .bio-field select option { background-color: #1a1a1a; color: #f0f0f0; }
+
+  .bio-field textarea { resize: vertical; min-height: 72px; }
+  .bio-field .hint { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .bio-gen-actions { display: flex; gap: 12px; margin-top: 28px; }
+
+  .btn-generate {
+    flex: 1; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+    color: #0a0a0a; background: var(--accent); border: none; border-radius: var(--radius);
+    padding: 14px 28px; cursor: pointer; transition: var(--transition);
+  }
+  .btn-generate:hover { background: var(--accent-dim); transform: translateY(-1px); }
+  .btn-generate:active { transform: translateY(0); }
+  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-generate .spinner {
+    display: none; width: 18px; height: 18px; border: 2px solid transparent;
+    border-top-color: #0a0a0a; border-radius: 50%; animation: spin 0.7s linear infinite;
+    margin-right: 8px; vertical-align: middle;
+  }
+  .btn-generate.loading .spinner { display: inline-block; }
+  .btn-generate.loading .btn-text { opacity: 0.7; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn-clear {
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    color: var(--text-muted); background: transparent; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 20px; cursor: pointer;
+  }
+  .btn-clear:hover { color: var(--text-secondary); border-color: var(--border-focus); }
+
+  .bio-output-wrapper { display: none; margin-bottom: 32px; }
+  .bio-output-wrapper.visible { display: block; animation: fadeUp 0.4s ease; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .bio-output-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .bio-output-title { font-size: 16px; font-weight: 600; }
+  .bio-output-tabs { display: flex; gap: 4px; background: var(--bg-input); border-radius: var(--radius-sm); padding: 3px; }
+
+  .bio-tab {
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+    color: var(--text-muted); background: transparent; border: none;
+    border-radius: 4px; padding: 6px 14px; cursor: pointer;
+  }
+  .bio-tab.active { color: var(--text-primary); background: var(--bg-hover); }
+  .bio-tab:hover:not(.active) { color: var(--text-secondary); }
+
+  .bio-output-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+
+  .bio-output-meta {
+    display: flex; align-items: center; gap: 12px; padding: 16px 24px;
+    border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-muted);
+  }
+
+  .bio-output-meta .platform-badge {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--accent); background: var(--accent-glow);
+    padding: 3px 10px; border-radius: 100px;
+  }
+
+  .bio-output-meta .word-count { margin-left: auto; }
+
+  .bio-output-text { padding: 24px; font-size: 15px; line-height: 1.75; min-height: 120px; }
+  .bio-output-text p { margin-bottom: 14px; }
+  .bio-output-text p:last-child { margin-bottom: 0; }
+
+  .bio-output-actions { display: flex; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--border); }
+
+  .btn-action {
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    color: var(--text-secondary); background: var(--bg-input);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 9px 18px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-action:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-focus); }
+  .btn-action.copied { color: var(--success); border-color: var(--success); }
+  .btn-action svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  .bio-saved-section { display: none; margin-bottom: 32px; }
+  .bio-saved-section.visible { display: block; }
+  .bio-saved-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .bio-saved-header h3 { font-size: 15px; font-weight: 600; }
+  .bio-saved-count { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+  .bio-saved-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .bio-saved-item {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 20px;
+  }
+  .bio-saved-item:hover { border-color: var(--border-focus); }
+  .bio-saved-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .bio-saved-item-label { font-size: 12px; font-weight: 600; color: var(--accent); }
+  .bio-saved-item-actions { display: flex; gap: 6px; }
+
+  .btn-saved-action {
+    font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--text-muted);
+    background: transparent; border: 1px solid var(--border); border-radius: 4px;
+    padding: 4px 10px; cursor: pointer;
+  }
+  .btn-saved-action:hover { color: var(--text-secondary); border-color: var(--border-focus); }
+  .btn-saved-action.delete:hover { color: var(--danger); border-color: var(--danger); }
+
+  .bio-saved-item-text {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .bio-error {
+    display: none; background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2);
+    color: #ff6b6b; font-size: 13px; padding: 12px 18px; border-radius: var(--radius-sm); margin-bottom: 20px;
+  }
+  .bio-error.visible { display: block; animation: fadeUp 0.3s ease; }
+
+  .bio-tip {
+    background: var(--accent-glow); border: 1px solid rgba(200, 255, 0, 0.12);
+    border-radius: var(--radius); padding: 16px 20px; margin-top: 24px;
+    font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+  }
+  .bio-tip strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="bio-generator-wrapper">
+  <div class="bio-gen-header">
+    <div class="bio-gen-badge">Free artist bio generator</div>
+    <h2>Artist Bio Generator</h2>
+    <p>Create a professional music bio for Spotify, your EPK, press kits, and social media. Fill in your details, choose a tone, and get a ready-to-use bio in seconds.</p>
+  </div>
+
+  <div class="bio-steps">
+    <div class="bio-step"><div class="bio-step-num">01</div><div class="bio-step-label">Enter your details</div></div>
+    <div class="bio-step"><div class="bio-step-num">02</div><div class="bio-step-label">Pick tone and platform</div></div>
+    <div class="bio-step"><div class="bio-step-num">03</div><div class="bio-step-label">Copy your bio</div></div>
+  </div>
+
+  <div class="bio-error" id="bioError"></div>
+
+  <div class="bio-form">
+    <div class="bio-form-section">
+      <div class="bio-form-section-title">Identity</div>
+      <div class="bio-form-row">
+        <div class="bio-field">
+          <label>Artist or band name *</label>
+          <input type="text" id="artistName" placeholder="e.g. Nova Eclipse">
+        </div>
+        <div class="bio-field">
+          <label>Where you're from <span class="optional">optional</span></label>
+          <input type="text" id="location" placeholder="e.g. Atlanta, GA">
+        </div>
+      </div>
+      <div class="bio-form-row">
+        <div class="bio-field">
+          <label>Genre *</label>
+          <select id="genre">
+            <option value="">Select genre</option>
+            <option value="Hip-Hop / Rap">Hip-Hop / Rap</option>
+            <option value="R&B / Soul">R&B / Soul</option>
+            <option value="Pop">Pop</option>
+            <option value="Rock">Rock</option>
+            <option value="Alternative / Indie">Alternative / Indie</option>
+            <option value="Electronic / EDM">Electronic / EDM</option>
+            <option value="Country">Country</option>
+            <option value="Latin">Latin</option>
+            <option value="Afrobeats">Afrobeats</option>
+            <option value="Drill">Drill</option>
+            <option value="Trap">Trap</option>
+            <option value="Lo-Fi">Lo-Fi</option>
+            <option value="Jazz">Jazz</option>
+            <option value="Classical">Classical</option>
+            <option value="Metal">Metal</option>
+            <option value="Punk">Punk</option>
+            <option value="Gospel / Christian">Gospel / Christian</option>
+            <option value="Folk / Acoustic">Folk / Acoustic</option>
+            <option value="Dancehall / Reggae">Dancehall / Reggae</option>
+            <option value="Amapiano">Amapiano</option>
+            <option value="Phonk">Phonk</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="bio-field">
+          <label>Your role</label>
+          <select id="role">
+            <option value="Solo artist">Solo artist</option>
+            <option value="Band">Band</option>
+            <option value="Producer / Beatmaker">Producer / Beatmaker</option>
+            <option value="DJ">DJ</option>
+            <option value="Singer-songwriter">Singer-songwriter</option>
+            <option value="Rapper">Rapper</option>
+            <option value="Vocalist">Vocalist</option>
+            <option value="Multi-instrumentalist">Multi-instrumentalist</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="bio-form-section">
+      <div class="bio-form-section-title">Sound & Story</div>
+      <div class="bio-form-row full">
+        <div class="bio-field">
+          <label>Describe your sound in a sentence or two <span class="optional">optional</span></label>
+          <textarea id="soundDescription" placeholder="e.g. Dark melodic rap with 808s, heavy on atmosphere and introspective lyrics."></textarea>
+        </div>
+      </div>
+      <div class="bio-form-row full">
+        <div class="bio-field">
+          <label>Influences <span class="optional">optional — 3 to 5 artists</span></label>
+          <input type="text" id="influences" placeholder="e.g. Frank Ocean, SZA, Daniel Caesar">
+        </div>
+      </div>
+      <div class="bio-form-row full">
+        <div class="bio-field">
+          <label>Key achievements <span class="optional">optional</span></label>
+          <textarea id="achievements" placeholder="e.g. 500K Spotify streams, opened for Russ in 2024, featured on Lyrical Lemonade"></textarea>
+          <span class="hint">Streams, press, shows, co-signs, sync placements, playlist adds — anything notable</span>
+        </div>
+      </div>
+      <div class="bio-form-row full">
+        <div class="bio-field">
+          <label>Current project <span class="optional">optional</span></label>
+          <input type="text" id="currentProject" placeholder="e.g. Debut EP 'Midnight Drive' dropping March 2026">
+        </div>
+      </div>
+    </div>
+
+    <div class="bio-form-section">
+      <div class="bio-form-section-title">Output Settings</div>
+      <div class="bio-form-row triple">
+        <div class="bio-field">
+          <label>Tone</label>
+          <select id="tone">
+            <option value="professional and polished">Professional</option>
+            <option value="conversational and approachable">Conversational</option>
+            <option value="raw and underground">Raw & underground</option>
+            <option value="mysterious and atmospheric">Mysterious</option>
+            <option value="energetic and hype">Energetic & hype</option>
+            <option value="poetic and introspective">Poetic</option>
+          </select>
+        </div>
+        <div class="bio-field">
+          <label>Platform</label>
+          <select id="platform">
+            <option value="Spotify or Apple Music">Spotify / Apple Music</option>
+            <option value="website or EPK">Website / EPK</option>
+            <option value="Instagram or TikTok bio">Instagram / TikTok</option>
+            <option value="press kit for media and blogs">Press kit</option>
+            <option value="general purpose, works anywhere">General</option>
+          </select>
+        </div>
+        <div class="bio-field">
+          <label>Length</label>
+          <select id="length">
+            <option value="short, 2 to 3 sentences">Short</option>
+            <option value="medium, 1 to 2 paragraphs">Medium</option>
+            <option value="long, 3 to 4 paragraphs">Long</option>
+          </select>
+        </div>
+      </div>
+      <div class="bio-form-row full">
+        <div class="bio-field">
+          <label>Person</label>
+          <select id="person">
+            <option value="third person, referring to the artist by name">Third person (recommended for Spotify & press)</option>
+            <option value="first person, written as if the artist is speaking">First person (good for socials & website)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="bio-gen-actions">
+      <button class="btn-generate" id="btnGenerate" onclick="generateBio()">
+        <span class="spinner"></span>
+        <span class="btn-text">Generate bio</span>
+      </button>
+      <button class="btn-clear" onclick="clearForm()">Clear</button>
+    </div>
+
+    <div class="bio-tip">
+      <strong>Tip:</strong> Generate once with "Professional" tone for Spotify and press, then switch to "Conversational" and "First person" for a second version you can paste into Instagram or your website about page.
+    </div>
+  </div>
+
+  <div class="bio-output-wrapper" id="bioOutput">
+    <div class="bio-output-header">
+      <div class="bio-output-title">Your bio</div>
+      <div class="bio-output-tabs" id="bioTabs"></div>
+    </div>
+    <div class="bio-output-card">
+      <div class="bio-output-meta">
+        <span class="platform-badge" id="outputPlatform">Spotify</span>
+        <span id="outputTone"></span>
+        <span class="word-count" id="outputWordCount"></span>
+      </div>
+      <div class="bio-output-text" id="outputText"></div>
+      <div class="bio-output-actions">
+        <button class="btn-action" onclick="copyBio()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span id="copyLabel">Copy</span>
+        </button>
+        <button class="btn-action" onclick="saveBio()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save
+        </button>
+        <button class="btn-action" onclick="generateBio()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Regenerate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bio-saved-section" id="savedSection">
+    <div class="bio-saved-header">
+      <h3>Saved bios</h3>
+      <span class="bio-saved-count" id="savedCount">0 saved</span>
+    </div>
+    <div class="bio-saved-list" id="savedList"></div>
+  </div>
+</div>
+
+<script>
+  let generatedBios = [];
+  let currentBioIndex = 0;
+  let savedBios = JSON.parse(localStorage.getItem('bio_gen_saved') || '[]');
+  renderSaved();
+
+  function clearForm() {
+    document.getElementById('artistName').value = '';
+    document.getElementById('location').value = '';
+    document.getElementById('genre').selectedIndex = 0;
+    document.getElementById('soundDescription').value = '';
+    document.getElementById('influences').value = '';
+    document.getElementById('achievements').value = '';
+    document.getElementById('currentProject').value = '';
+    document.getElementById('bioOutput').classList.remove('visible');
+    document.getElementById('bioError').classList.remove('visible');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('bioError');
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function hideError() {
+    document.getElementById('bioError').classList.remove('visible');
+  }
+
+  async function generateBio() {
+    hideError();
+    const artistName = document.getElementById('artistName').value.trim();
+    const genre = document.getElementById('genre').value;
+    if (!artistName) return showError('Enter your artist or band name to generate a bio.');
+    if (!genre) return showError('Select a genre so the bio fits your sound.');
+
+    const location = document.getElementById('location').value.trim();
+    const role = document.getElementById('role').value;
+    const sound = document.getElementById('soundDescription').value.trim();
+    const influences = document.getElementById('influences').value.trim();
+    const achievements = document.getElementById('achievements').value.trim();
+    const currentProject = document.getElementById('currentProject').value.trim();
+    const tone = document.getElementById('tone').value;
+    const platform = document.getElementById('platform').value;
+    const length = document.getElementById('length').value;
+    const person = document.getElementById('person').value;
+
+    let prompt = `Write a musician bio for the following artist. Return ONLY the bio text, no headers, no labels, no markdown formatting, no quotation marks wrapping the bio. Just the clean bio text ready to copy and paste.\n\nArtist name: ${artistName}\nRole: ${role}\nGenre: ${genre}`;
+    if (location) prompt += `\nFrom: ${location}`;
+    if (sound) prompt += `\nSound description: ${sound}`;
+    if (influences) prompt += `\nInfluences: ${influences}`;
+    if (achievements) prompt += `\nKey achievements: ${achievements}`;
+    if (currentProject) prompt += `\nCurrent project: ${currentProject}`;
+    prompt += `\n\nTone: ${tone}\nPlatform: ${platform}\nLength: ${length}\nPerspective: ${person}\n\nGuidelines:\n- Write specifically for the ${platform} platform\n- Make it sound like a real artist bio, not an AI template\n- Do not start with generic phrases like "Hailing from" or "Born and raised"\n- If achievements are listed, weave them in naturally\n- Match the tone precisely\n- End with something forward-looking\n- Do not use cliches like "pushing boundaries" or "genre-defying" or "tapestry" or "sonic landscape"\n- Keep it authentic and specific to this artist`;
+
+    const btn = document.getElementById('btnGenerate');
+    btn.disabled = true;
+    btn.classList.add('loading');
+
+    try {
+      // ── Calls YOUR local proxy server, not Anthropic directly ──
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1024,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        if (response.status === 401) throw new Error('Invalid API key on the server. Check your ANTHROPIC_API_KEY.');
+        throw new Error(err.error?.message || `API error (${response.status})`);
+      }
+
+      const data = await response.json();
+      const bioText = data.content.filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
+      if (!bioText) throw new Error('No bio was generated. Try again.');
+
+      generatedBios.push({
+        text: bioText,
+        platform: platform.split(',')[0].split(' or ')[0].trim(),
+        tone, wordCount: bioText.split(/\s+/).length
+      });
+      currentBioIndex = generatedBios.length - 1;
+      renderOutput();
+    } catch (err) {
+      showError(err.message || 'Something went wrong. Try again.');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+
+  function renderOutput() {
+    const wrapper = document.getElementById('bioOutput');
+    wrapper.classList.add('visible');
+    const bio = generatedBios[currentBioIndex];
+    const tabsEl = document.getElementById('bioTabs');
+    tabsEl.innerHTML = generatedBios.length > 1
+      ? generatedBios.map((b, i) => `<button class="bio-tab ${i === currentBioIndex ? 'active' : ''}" onclick="switchBio(${i})">V${i + 1}</button>`).join('')
+      : '';
+    document.getElementById('outputPlatform').textContent = bio.platform;
+    document.getElementById('outputTone').textContent = bio.tone;
+    document.getElementById('outputWordCount').textContent = bio.wordCount + ' words';
+    const textEl = document.getElementById('outputText');
+    textEl.innerHTML = bio.text.split('\n\n').filter(p => p.trim()).map(p => `<p>${p.trim()}</p>`).join('');
+    document.getElementById('copyLabel').textContent = 'Copy';
+    wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function switchBio(i) { currentBioIndex = i; renderOutput(); }
+
+  function copyBio() {
+    navigator.clipboard.writeText(generatedBios[currentBioIndex].text).then(() => {
+      const label = document.getElementById('copyLabel');
+      label.textContent = 'Copied';
+      const b = label.closest('.btn-action');
+      b.classList.add('copied');
+      setTimeout(() => { label.textContent = 'Copy'; b.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function saveBio() {
+    const bio = generatedBios[currentBioIndex];
+    savedBios.unshift({ text: bio.text, platform: bio.platform, tone: bio.tone, artist: document.getElementById('artistName').value.trim(), date: new Date().toLocaleDateString() });
+    localStorage.setItem('bio_gen_saved', JSON.stringify(savedBios));
+    renderSaved();
+  }
+
+  function renderSaved() {
+    const section = document.getElementById('savedSection');
+    const list = document.getElementById('savedList');
+    const count = document.getElementById('savedCount');
+    if (!savedBios.length) { section.classList.remove('visible'); return; }
+    section.classList.add('visible');
+    count.textContent = savedBios.length + ' saved';
+    list.innerHTML = savedBios.map((bio, i) => `
+      <div class="bio-saved-item">
+        <div class="bio-saved-item-header">
+          <span class="bio-saved-item-label">${bio.artist || 'Bio'} · ${bio.platform} · ${bio.tone}</span>
+          <div class="bio-saved-item-actions">
+            <button class="btn-saved-action" onclick="copySaved(${i})">Copy</button>
+            <button class="btn-saved-action delete" onclick="deleteSaved(${i})">Delete</button>
+          </div>
+        </div>
+        <div class="bio-saved-item-text">${bio.text}</div>
+      </div>`).join('');
+  }
+
+  function copySaved(i) { navigator.clipboard.writeText(savedBios[i].text); }
+  function deleteSaved(i) { savedBios.splice(i, 1); localStorage.setItem('bio_gen_saved', JSON.stringify(savedBios)); renderSaved(); }
+</script>
+</body>
+</html>
